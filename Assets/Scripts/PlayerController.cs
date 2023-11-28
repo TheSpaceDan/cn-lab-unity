@@ -44,11 +44,18 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("isShooting", false);
         UIController.instance.weaponTempSlider.maxValue = maxHeat;
         SwitchGun();
+        
+        Transform newTransform = SpawnManager.instance.GetSpawnPoint();
+        transform.position = newTransform.position;
+        transform.rotation = newTransform.rotation;
     }
 
     // Update is called once per frame
     void Update()
     {
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
+
         mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSens;
 
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + mouseInput.x, transform.rotation.eulerAngles.z);
@@ -148,13 +155,20 @@ public class PlayerController : MonoBehaviour
             }
             SwitchGun();
         }
+        
+        //weapon switching with number keys 1-3
+        for (int i = 0; i < allGuns.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                currentGun = i;
+                SwitchGun();
+            }
+        }
     }
 
     private void FixedUpdate()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
-
         Vector3 moveDirection = (transform.forward * verticalInput + transform.right * horizontalInput).normalized;
         moveDirection.y = 0;
 
