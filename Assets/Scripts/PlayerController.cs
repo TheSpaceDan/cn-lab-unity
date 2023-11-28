@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,15 +13,21 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     Vector3 moveDirection;
     private Rigidbody rb;
+    public Camera cam;
 
     public bool invertLook;
     private bool isGrounded;
     public float jumpForce = 5f;
 
+    public GameObject bulletImpact;
+    public float timeBetweenShots = 0.1f;
+    private float shotCounter;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        cam = Camera.main;
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -57,6 +64,21 @@ public class PlayerController : MonoBehaviour
         {
             speed = 4f;
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            shotCounter -= Time.deltaTime;
+            
+            if (shotCounter <= 0)
+            {
+                Shoot();
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -68,6 +90,21 @@ public class PlayerController : MonoBehaviour
         moveDirection.y = 0;
 
         rb.MovePosition(rb.position + moveDirection * speed * Time.deltaTime);
+    }
+    
+    private void Shoot()
+    {
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        ray.origin = cam.transform.position;
+        
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Debug.Log("we hit " + hit.collider.gameObject.name);
+            GameObject bulletImpactObject = Instantiate(bulletImpact, hit.point + (hit.normal * 0.0002f), Quaternion.LookRotation(hit.normal, Vector3.up));
+            Destroy(bulletImpactObject, 7f);
+        }
+        
+        shotCounter = timeBetweenShots;
     }
 
     private void OnCollisionEnter(Collision collision)
