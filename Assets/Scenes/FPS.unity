@@ -10681,7 +10681,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isAutomatic: 0
   timeBetweenShots: 0.1
-  heatPerShot: 2
+  heatPerShot: 1
   muzzleFlash: {fileID: 2134032278}
 --- !u!1 &1696678937
 GameObject:
@@ -11426,5 +11426,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isAutomatic: 1
   timeBetweenShots: 0.2
-  heatPerShot: 1
+  heatPerShot: 1.5
   muzzleFlash: {fileID: 1861535904}
