@@ -17,8 +17,12 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public GameObject createdRoomScreen;
     public TMP_Text roomNameText;
+
+    public GameObject roomBrowserScreen;
+    public RoomButtonScript roomButton;
+    private List<RoomButtonScript> allRoomButtons = new List<RoomButtonScript>();
     
-    void Awake()
+    void Awake()    
     {
         instance = this;
     }
@@ -83,5 +87,39 @@ public class Launcher : MonoBehaviourPunCallbacks
         loadingText.text = "Leaving Room...";
         
         PhotonNetwork.LeaveRoom();
+    }
+    
+    public void OpenRoomBrowser()   
+    {
+        roomBrowserScreen.SetActive(true);
+    }
+    
+    public void CloseRoomBrowser()
+    {
+        roomBrowserScreen.SetActive(false);
+    }
+    
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        foreach (RoomButtonScript button in allRoomButtons)
+        {
+            Destroy(button.gameObject);
+        }
+        
+        allRoomButtons.Clear();
+        
+        roomButton.gameObject.SetActive(false);
+        
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            if (roomList[i].PlayerCount != roomList[i].MaxPlayers && !roomList[i].RemovedFromList)
+            {
+                RoomButtonScript newButton = Instantiate(roomButton, roomButton.transform.parent);
+                newButton.SetButtonDetails(roomList[i]);
+                newButton.gameObject.SetActive(true);
+                
+                allRoomButtons.Add(newButton);
+            } 
+        }
     }
 }
