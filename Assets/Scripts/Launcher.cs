@@ -17,6 +17,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public GameObject createdRoomScreen;
     public TMP_Text roomNameText;
+    public TMP_Text playerNameLabel;
+    public List<TMP_Text> playerList;
 
     public GameObject roomBrowserScreen;
     public RoomButtonScript roomButton;
@@ -33,6 +35,15 @@ public class Launcher : MonoBehaviourPunCallbacks
         loadingText.text = "Connecting...";
         
         PhotonNetwork.ConnectUsingSettings();
+    }
+    
+    public void CloseMenus() 
+    {
+        loadingScreen.SetActive(false);    
+        roomScreen.SetActive(false);
+        createdRoomScreen.SetActive(false);
+        roomBrowserScreen.SetActive(false);    
+    
     }
     
     public override void OnConnectedToMaster()
@@ -121,5 +132,56 @@ public class Launcher : MonoBehaviourPunCallbacks
                 allRoomButtons.Add(newButton);
             } 
         }
+    }
+    
+    public void JoinRoom(RoomInfo inputInfo)
+    {
+        PhotonNetwork.JoinRoom(inputInfo.Name);
+        
+        CloseMenus();
+        loadingScreen.SetActive(true);
+        loadingText.text = "Joining Room...";
+    }
+    
+    public override void OnJoinedRoom()
+    {
+        CloseMenus();
+        createdRoomScreen.SetActive(true);
+        
+        PhotonNetwork.NickName = "Player " + Random.Range(0, 10000);
+        roomNameText.text = "Room " + PhotonNetwork.CurrentRoom.Name;
+        
+        ListAllPlayers();
+    }
+
+    public void ListAllPlayers()
+    {
+        // playerLabel is the name of the TMP_Text player, playerList is the TMP_Text list
+        foreach (TMP_Text playerLabel in playerList)
+        {
+            Destroy(playerLabel.gameObject);
+        }
+        playerList.Clear();
+        
+        Player[] players = PhotonNetwork.PlayerList;
+        
+        for (int i = 0; i < players.Length; i++)
+        {
+            TMP_Text newPlayerLabel = Instantiate(playerNameLabel, playerNameLabel.transform.parent);
+            newPlayerLabel.text = players[i].NickName;
+            newPlayerLabel.gameObject.SetActive(true);
+            
+            playerList.Add(newPlayerLabel);
+        }
+    }
+    
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        ListAllPlayers();
+    }
+    
+    public void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
     }
 }

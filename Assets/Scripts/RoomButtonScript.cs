@@ -14,4 +14,9 @@ public class RoomButtonScript : MonoBehaviour
         info = inputInfo;
         roomNameText.text = inputInfo.Name;
     }
+
+    public void OnClick_Button()
+    {
+        Launcher.instance.JoinRoom(info);
+    }
 }
